@@ -1,7 +1,7 @@
 from __future__ import annotations
+import sys
 from enum import Enum
 import time
-from copy import deepcopy
 
 
 Map = list[list[str]]
@@ -53,19 +53,18 @@ class Dir(Enum):
 
 
 
-def parse_input(path: str) -> tuple[Map, Pos, Dir]:
-    with open(path, "r") as f:
-        data = f.read().splitlines()
-        data = [[char for char in line] for line in data]
+def parse_input(input: str) -> tuple[Map, Pos, Dir]:
+    data = input.splitlines()
+    data = [[char for char in line] for line in data]
 
-        for y in range(len(data)):
-            for x in range(len(data[y])):
-                dir = Dir.from_char(data[y][x])
-                if dir is not None:
-                    data[y][x] = "."
-                    return data, (x, y), dir
+    for y in range(len(data)):
+        for x in range(len(data[y])):
+            dir = Dir.from_char(data[y][x])
+            if dir is not None:
+                data[y][x] = "."
+                return data, (x, y), dir
 
-        raise RuntimeError("No starting position found")
+    raise RuntimeError("No starting position found")
 
 
 def print_map(map: Map, p: Pos, d: Dir):
@@ -155,7 +154,7 @@ def part2(map: Map, p0: Pos, d0: Dir) -> int:
 
 
 def main():
-    map, p0, d0 = parse_input("input.txt")
+    map, p0, d0 = parse_input(sys.stdin.read())
 
     total = part1(map, p0, d0, animate=False)
     print("part 1:", total)
