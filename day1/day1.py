@@ -1,13 +1,13 @@
+import sys
 
 
-def parse_input() -> tuple[list[int], list[int]]:
-    with open("input.txt", "r") as f:
-        data = f.readlines()
-        data = [[int(x) for x in line.strip().split("   ")] for line in data]
-        
-        column1, column2 = zip(*data)
-        column1 = sorted(column1)
-        column2 = sorted(column2)
+def parse_input(input: str) -> tuple[list[int], list[int]]:
+    data = input.splitlines()
+    data = [[int(x) for x in line.split("   ")] for line in data]
+    
+    column1, column2 = zip(*data)
+    column1 = sorted(column1)
+    column2 = sorted(column2)
 
     return column1, column2
 
@@ -17,7 +17,7 @@ def distance(x1: int, x2: int) -> int:
 
 
 def main():
-    column1, column2 = parse_input()
+    column1, column2 = parse_input(sys.stdin.read())
 
     total = 0
     for x, y in zip(column1, column2):

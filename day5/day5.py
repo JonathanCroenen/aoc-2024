@@ -1,3 +1,4 @@
+import sys
 from copy import copy
 
 
@@ -6,18 +7,17 @@ Update = list[int]
 Input = tuple[RuleSet, list[Update]]
 
 
-def parse_input(path: str) -> Input:
-    with open(path, "r") as f:
-        data = f.read().splitlines()
+def parse_input(input: str) -> Input:
+    data = input.splitlines()
 
-        section = data.index("")
-        rules = [line.split("|", maxsplit=1) for line in data[:section]]
+    section = data.index("")
+    rules = [line.split("|", maxsplit=1) for line in data[:section]]
 
-        lookup = {}
-        for a, b in rules:
-            lookup.setdefault(int(a), set()).add(int(b))
+    lookup = {}
+    for a, b in rules:
+        lookup.setdefault(int(a), set()).add(int(b))
 
-        updates = [[int(x) for x in line.split(",")] for line in data[section + 1:]]
+    updates = [[int(x) for x in line.split(",")] for line in data[section + 1:]]
     
     return lookup, updates
 
@@ -76,7 +76,7 @@ def part2(rules: RuleSet, updates: list[Update]) -> int:
 
 
 def main():
-    rules, updates = parse_input("input.txt")
+    rules, updates = parse_input(sys.stdin.read())
 
     result = part1(rules, updates)
     print("part 1:", result)

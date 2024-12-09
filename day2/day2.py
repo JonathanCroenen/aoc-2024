@@ -1,11 +1,11 @@
+import sys
 
 Input = list[list[int]]
 
 
-def parse_input(path: str) -> Input:
-    with open(path, "r") as f:
-        data = f.readlines()
-        data = [[int(x) for x in line.split()] for line in data]
+def parse_input(input: str) -> Input:
+    data = input.splitlines()
+    data = [[int(x) for x in line.split()] for line in data]
 
     return data
 
@@ -73,7 +73,7 @@ def part2(data: Input) -> int:
     return total
 
 def main():
-    data = parse_input("input.txt")
+    data = parse_input(sys.stdin.read())
 
     total = part1(data)
     print("part 1:", total)

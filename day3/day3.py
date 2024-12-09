@@ -1,9 +1,5 @@
+import sys
 import re
-
-
-def load_input(path: str) -> str:
-    with open(path, "r") as f:
-        return f.read()
 
 
 def part1(mem: str) -> int:
@@ -36,7 +32,7 @@ def part2(mem: str) -> int:
 
 
 def main():
-    mem = load_input("input.txt")
+    mem = sys.stdin.read()
 
     result = part1(mem)
     print("part 1:", result)

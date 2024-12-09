@@ -1,12 +1,12 @@
+import sys
 from enum import Enum
 
 Input = list[list[str]]
 
 
-def load_input(path: str) -> Input:
-    with open(path, 'r') as f:
-        data = f.read().splitlines()
-        data = [[x for x in line] for line in data]
+def parse_input(input: str) -> Input:
+    data = input.splitlines()
+    data = [[x for x in line] for line in data]
 
     return data
 
@@ -86,7 +86,7 @@ def part2(input: Input) -> int:
 
 
 def main():
-    input = load_input("input.txt")
+    input = parse_input(sys.stdin.read())
 
     total = part1(input)
     print("part 1:", total)
