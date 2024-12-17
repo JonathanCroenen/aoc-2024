@@ -34,14 +34,16 @@ def area(region: set) -> int:
     return len(region)
 
 
-def perimiter(map: Map, crop: str, region: set) -> int:
+def is_edge(region: set, x: int, y: int) -> bool:
+    return (x, y) not in region
+
+
+def perimiter(map: Map, region: set) -> int:
     total = 0
     for x, y in region:
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             nx, ny = x + dx, y + dy
-            if not is_in_bounds(map, nx, ny):
-                total += 1
-            elif map[ny][nx] != crop:
+            if is_edge(region, nx, ny):
                 total += 1
 
     return total
@@ -54,7 +56,7 @@ def find_regions(map: Map) -> list[set]:
         for x in range(len(map[0])):
             if (x, y) not in consumed:
                 consumed.add((x, y))
-                regions.append((map[y][x], make_region(map, x, y, consumed)))
+                regions.append(make_region(map, x, y, consumed))
 
     return regions
 
@@ -63,82 +65,55 @@ def part1(map: Map) -> int:
     regions = find_regions(map)
 
     result = 0
-    for crop, region in regions:
-        result += area(region) * perimiter(map, crop, region)
+    for region in regions:
+        result += area(region) * perimiter(map, region)
 
     return result
 
 
-def perimiter2(map: Map, crop: str, region: set) -> int:
+def perimiter2(map: Map, region: set) -> int:
+    # n sides == n corners
     total = 0
-
-    py = -1
-    is_fence = False
+    handled = set()
+    directions = [
+        ((-1, 0), (-1, -1), (0, -1)),
+        ((0, -1), (1, -1), (1, 0)),
+        ((1, 0), (1, 1), (0, 1)),
+        ((0, 1), (-1, 1), (-1, 0)),
+    ]
     for x, y in sorted(region):
-        if py == -1:
-            py = y
+        for (dx1, dy1), (dx2, dy2), (dx3, dy3) in directions:
+            to_check = tuple(
+                sorted(
+                    (
+                        (x, y),
+                        (x + dx1, y + dy1),
+                        (x + dx2, y + dy2),
+                        (x + dx3, y + dy3),
+                    )
+                )
+            )
 
-        if y != py and is_fence:
-            total += 1
-        py = y
+            if to_check in handled:
+                continue
 
-        if not is_in_bounds(map, x, y - 1) or map[y - 1][x] != crop:
-            if not is_fence:
+            handled.add(to_check)
+
+            this = is_edge(region, *to_check[0])
+            neighbor1 = is_edge(region, *to_check[1])
+            neighbor2 = is_edge(region, *to_check[2])
+            neighbor3 = is_edge(region, *to_check[3])
+            count = [this, neighbor1, neighbor2, neighbor3].count(True)
+
+            if count % 2 == 1:
                 total += 1
-            is_fence = True
-        else:
-            is_fence = False
+                continue
 
-    py = -1
-    is_fence = False
-    for x, y in sorted(region):
-        if py == -1:
-            py = y
-
-        if y != py and is_fence:
-            total += 1
-        py = y
-
-        if not is_in_bounds(map, x, y + 1) or map[y + 1][x] != crop:
-            if not is_fence:
-                total += 1
-            is_fence = True
-        else:
-            is_fence = False
-
-    px = -1
-    is_fence = False
-    for x, y in sorted(region, key=lambda x: (x[1], x[0])):
-        if px == -1:
-            px = x
-
-        if x != px and is_fence:
-            total += 1
-        px = x
-
-        if not is_in_bounds(map, x - 1, y) or map[y][x - 1] != crop:
-            if not is_fence:
-                total += 1
-            is_fence = True
-        else:
-            is_fence = False
-
-    px = -1
-    is_fence = False
-    for x, y in sorted(region, key=lambda x: (x[1], x[0])):
-        if px == -1:
-            px = x
-
-        if x != px and is_fence:
-            total += 1
-        px = x
-
-        if not is_in_bounds(map, x + 1, y) or map[y][x + 1] != crop:
-            if not is_fence:
-                total += 1
-            is_fence = True
-        else:
-            is_fence = False
+            diagonal = count == 2 and (
+                (neighbor1 and neighbor2) or (this and neighbor3)
+            )
+            if diagonal:
+                total += 2
 
     return total
 
@@ -147,9 +122,8 @@ def part2(map: Map) -> int:
     regions = find_regions(map)
 
     result = 0
-    for crop, region in regions:
-        print(area(region), perimiter2(map, crop, region))
-        result += area(region) * perimiter2(map, crop, region)
+    for region in regions:
+        result += area(region) * perimiter2(map, region)
 
     return result
 
